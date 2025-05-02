@@ -1,0 +1,66 @@
+
+int vlan 11
+standby 1 ip 172.16.11.254
+standby 1 priority 150
+standby 1 preempt
+int vlan 12
+standby 2 ip 172.16.12.254
+standby 2 priority 150
+standby 2 preempt
+int vlan 13
+standby 3 ip 172.16.13.254
+standby 3 priority 150
+standby 3 preempt
+int vlan 14
+standby 4 ip 172.16.14.254
+standby 4 priority 150
+standby 4 preempt
+int vlan 15
+standby 5 ip 172.16.15.254
+standby 5 priority 150
+standby 5 preempt
+
+int vlan 21
+standby 6 ip 172.16.21.254
+int vlan 22
+standby 7 ip 172.16.22.254
+int vlan 23
+standby 8 ip 172.16.23.254
+int vlan 24
+standby 9 ip 172.16.24.254
+int vlan 25
+standby 10 ip 172.16.25.254
+
+CW2:
+
+int vlan 21
+standby 6 ip 172.16.21.254
+standby 6 priority 150
+standby 6 preempt
+int vlan 22
+standby 7 ip 172.16.22.254
+standby 7 priority 150
+standby 7 preempt
+int vlan 23
+standby 8 ip 172.16.23.254
+standby 8 priority 150
+standby 8 preempt
+int vlan 24
+standby 9 ip 172.16.24.254
+standby 5 priority 150
+standby 9 preempt
+int vlan 25
+standby 10 ip 172.16.25.254
+standby 10 priority 150
+standby 10 preempt
+
+int vlan 11
+standby 1 ip 172.16.11.254
+int vlan 12
+standby 2 ip 172.16.12.254
+int vlan 13
+standby 3 ip 172.16.13.254
+int vlan 14
+standby 4 ip 172.16.14.254
+int vlan 15
+standby 5 ip 172.16.15.254

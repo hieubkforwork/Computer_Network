@@ -1,0 +1,117 @@
+access-list 100 permit ip 172.16.0.0 0.0.255.255 172.25.0.0 0.0.255.255
+access-list 110 permit ip 172.16.0.0 0.0.255.255 168.72.0.0 0.0.255.255
+crypto isakmp policy 10
+ encryption aes
+ authentication pre-share
+ group 5
+exit
+crypto isakmp key VPN address 172.25.2.2
+crypto isakmp key VPN address 168.72.3.2
+
+crypto ipsec transform-set VPN-SET esp-aes esp-sha-hmac
+crypto map VPN-MAP 10 ipsec-isakmp 
+ set peer 172.25.2.2
+ set pfs group5
+ set transform-set VPN-SET
+ match address 100
+crypto map VPN-MAP 20 ipsec-isakmp 
+ set peer 168.72.3.2
+ set pfs group5
+ set transform-set VPN-SET
+ match address 110
+
+interface Serial0/0/0
+ crypto map VPN-MAP
+
+  
+
+R2!
+access-list 100 permit ip 172.25.0.0 0.0.255.255 172.16.0.0 0.0.255.255
+
+crypto isakmp policy 10
+ encryption aes
+ authentication pre-share
+ group 5
+exit
+crypto isakmp key VPN address 172.16.55.2
+
+crypto ipsec transform-set VPN-SET esp-aes esp-sha-hmac
+crypto map VPN-MAP 10 ipsec-isakmp 
+ set peer 172.16.55.2
+ set pfs group5
+ set transform-set VPN-SET
+ match address 100
+
+interface Serial0/0/0
+ crypto map VPN-MAP
+
+R3!
+access-list 110 permit ip 168.72.0.0 0.0.255.255 172.16.0.0 0.0.255.255
+
+crypto isakmp policy 10
+ encryption aes
+ authentication pre-share
+ group 5
+exit
+crypto isakmp key VPN address 172.16.1.2
+crypto ipsec transform-set VPN-SET esp-aes esp-sha-hmac
+crypto map VPN-MAP 20 ipsec-isakmp 
+ set peer 172.16.1.2
+ set pfs group5
+ set transform-set VPN-SET
+ match address 110
+
+interface Serial0/0/0
+ crypto map VPN-MAP
+
+HUY:
+interface Serial0/0/0
+ no crypto map VPN-MAP
+exit
+no access-list 100
+no access-list 110
+
+no crypto isakmp policy 10
+no crypto isakmp key VPN address 172.25.2.2
+no crypto isakmp key VPN address 168.72.3.2
+
+no crypto ipsec transform-set VPN-SET
+
+no crypto map VPN-MAP 10 ipsec-isakmp
+no crypto map VPN-MAP 20 ipsec-isakmp
+
+
+
+
+
+no access-list 100
+
+no crypto isakmp policy 10
+no crypto isakmp key secretkey address 172.16.1.2
+
+no crypto ipsec transform-set VPN-SET
+
+no crypto map VPN-MAP 10 ipsec-isakmp
+
+interface Serial0/0/0
+ no crypto map
+
+no access-list 110
+
+interface se0/0/0
+no crypto map VPN-MAP
+exit
+no crypto isakmp policy 10
+no crypto isakmp key secretkey address 172.16.1.2
+
+no crypto ipsec transform-set VPN-SET
+no crypto map VPN-MAP 10 ipsec-isakmp
+no crypto map VPN-MAP 20 ipsec-isakmp
+
+interface Serial0/0/0
+ no crypto map
+
+Kiểm tra:
+show crypto isakmp sa
+show crypto ipsec sa
+show run | include crypto map

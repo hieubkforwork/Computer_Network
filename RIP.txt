@@ -1,0 +1,39 @@
+RIP:
+
+Router MAIN:
+!
+router rip
+version 2
+network 172.16.1.0
+network 172.16.10.0
+no auto-summary 
+ex
+
+ASA:
+!
+router rip
+version 2
+network 172.16.200.0
+network 172.16.10.0
+no auto-summary 
+ex
+
+CORE SWITCH:
+!
+router rip
+version 2
+network 172.16.11.0
+network 172.16.12.0
+network 172.16.13.0
+network 172.16.14.0
+network 172.16.15.0
+network 172.16.21.0
+network 172.16.22.0
+network 172.16.23.0
+network 172.16.24.0
+network 172.16.25.0
+network 172.16.50.0
+network 172.16.100.0
+network 172.16.150.0
+no auto-summary 
+ex

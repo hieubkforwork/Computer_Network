@@ -1,0 +1,23 @@
+Cấu hình AAA:
+aaa new-model
+tacacs-server host 172.16.100.110
+tacacs-server key benhvien
+aaa authentication login default group tacacs+ local
+aaa authorization exec default group tacacs+ local
+username admin privilege 15 password cisco
+
+line vty 0 4
+ login authentication default
+ transport input telnet
+
+Huỷ:
+no aaa new-model
+no username admin
+no enable password
+no tacacs-server host 172.16.100.110
+no tacacs-server key benhvien
+line vty 0 4
+no login authentication default
+no transport input
+no password
+login

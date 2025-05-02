@@ -1,0 +1,135 @@
+// Cấu hình ASA FIREWALL
+
+int gig1/1
+ip add 172 255.255.255.0
+nameif outside
+
+int gig1/2
+ip add 172 255.255.255.0
+nameif inside
+
+int gig1/3
+ip add 172 255.255.255.0
+nameif dmz
+security-level 50
+
+// Cấu hình ACL
+R_MAIN
+!
+access-list OUTSIDE extended permit icmp any any echo-reply
+--deny connection to important server in Main
+access-list OUTSIDE extended deny ip any host 172.16.100.101
+access-list OUTSIDE extended deny ip any host 172.16.100.7
+access-list OUTSIDE extended deny ip any host 172.16.100.9
+--permit connection from DBP to Main
+access-list OUTSIDE extended permit tcp 172.25.0.0 255.255.0.0 172.16.100.0 255.255.255.0
+access-list OUTSIDE extended permit udp 172.25.0.0 255.255.0.0 172.16.100.0 255.255.255.0 
+access-list OUTSIDE extended permit ip 172.25.0.0 255.255.0.0 172.16.100.0 255.255.255.0 
+access-list OUTSIDE extended permit ip 172.25.0.0 255.255.0.0 172.16.11.0 255.255.255.0 
+
+--permit connection from BHTQ to Main
+access-list OUTSIDE extended permit tcp 168.72.0.0 255.255.0.0 172.16.100.0 255.255.255.0
+access-list OUTSIDE extended permit udp 168.72.0.0 255.255.0.0 172.16.100.0 255.255.255.0 
+access-list OUTSIDE extended permit ip 168.72.0.0 255.255.0.0 172.16.100.0 255.255.255.0
+access-list OUTSIDE extended permit ip 168.72.0.0 255.255.0.0 172.16.11.0 255.255.255.0
+access-group OUTSIDE in interface outside
+!
+access-list DMZ extended permit icmp any any echo-reply
+access-list DMZ extended permit tcp any any
+access-list DMZ extended permit udp any any
+access-list DMZ extended permit ip any any
+access-group DMZ in interface dmz
+!
+--permit Camera access Server IOT
+access-list INSIDE extended permit ip 172.16.50.0 255.255.255.0 host 172.16.100.101  
+--deny Others to Server IOT 
+access-list INSIDE extended deny ip any host 172.16.100.101   
+access-list INSIDE extended deny ip any host 172.16.100.7   
+access-list INSIDE extended deny ip any host 172.16.100.9
+--deny Others access IOT web
+access-list INSIDE extended deny tcp 172.16.11.0 255.255.255.0 host 172.16.100.101   
+access-list INSIDE extended deny tcp 172.16.12.0 255.255.255.0 host 172.16.100.101
+access-list INSIDE extended deny tcp 172.16.13.0 255.255.255.0 host 172.16.100.101
+access-list INSIDE extended deny tcp 172.16.14.0 255.255.255.0 host 172.16.100.101
+access-list INSIDE extended deny tcp 172.16.15.0 255.255.255.0 host 172.16.100.101
+access-list INSIDE extended deny tcp 172.16.21.0 255.255.255.0 host 172.16.100.101
+access-list INSIDE extended deny tcp 172.16.22.0 255.255.255.0 host 172.16.100.101
+access-list INSIDE extended deny tcp 172.16.23.0 255.255.255.0 host 172.16.100.101
+access-list INSIDE extended deny tcp 172.16.24.0 255.255.255.0 host 172.16.100.101
+access-list INSIDE extended deny tcp 172.16.25.0 255.255.255.0 host 172.16.100.101
+access-list INSIDE extended deny tcp 172.16.150.0 255.255.255.0 host 172.16.100.101
+access-list INSIDE extended permit ip any any
+access-list INSIDE extended permit tcp any any
+access-list INSIDE extended permit udp any any
+access-group INSIDE in interface inside
+
+R_SITE_DBP
+!
+--deny connection to important server in DBP
+access-list OUTSIDE extended deny ip any host 172.25.100.4
+access-list OUTSIDE extended deny ip any host 172.25.100.101
+--permit data from Server in Main
+access-list OUTSIDE extended permit tcp 172.16.100.0 255.255.255.0 172.25.0.0 255.255.0.0
+access-list OUTSIDE extended permit udp 172.16.100.0 255.255.255.0 172.25.0.0 255.255.0.0
+access-list OUTSIDE extended permit ip 172.16.100.0 255.255.255.0 172.25.0.0 255.255.0.0
+access-list OUTSIDE extended permit ip 172.16.11.0 255.255.255.0 172.25.0.0 255.255.0.0
+access-group OUTSIDE in interface outside
+!
+access-list DMZ extended permit icmp any any echo-reply
+access-list DMZ extended permit tcp any any
+access-list DMZ extended permit udp any any
+access-list DMZ extended permit ip any any
+access-group DMZ in interface dmz
+
+!
+
+--permit Camera access Server IOT
+access-list INSIDE extended permit ip 172.25.50.0 255.255.255.0 host 172.25.100.101  
+--deny Others to Server IOT 
+access-list INSIDE extended deny ip any host 172.25.100.101   
+access-list INSIDE extended deny ip any host 172.25.100.4   
+
+--deny Others access IOT web
+access-list INSIDE extended deny tcp 172.25.11.0 255.255.255.0 host 172.25.100.101   
+access-list INSIDE extended deny tcp 172.25.12.0 255.255.255.0 host 172.25.100.101
+access-list INSIDE extended deny tcp 172.25.150.0 255.255.255.0 host 172.25.100.101
+access-list INSIDE extended permit ip any any
+access-list INSIDE extended permit tcp any any
+access-list INSIDE extended permit udp any any
+access-group INSIDE in interface inside
+
+R_SITE_BHTQ
+!
+--deny connection to important server in DBP
+access-list OUTSIDE extended deny ip any host 168.72.100.4
+access-list OUTSIDE extended deny ip any host 172.25.100.101
+--permit data from Server in Main
+access-list OUTSIDE extended permit tcp 172.16.100.0 255.255.255.0 168.72.0.0 255.255.0.0
+access-list OUTSIDE extended permit udp 172.16.100.0 255.255.255.0 168.72.0.0 255.255.0.0
+access-list OUTSIDE extended permit ip 172.16.100.0 255.255.255.0 168.72.0.0 255.255.0.0
+access-list OUTSIDE extended permit ip 172.16.11.0 255.255.255.0 168.72.0.0 255.255.0.0
+access-group OUTSIDE in interface outside
+!
+access-list DMZ extended permit icmp any any echo-reply
+access-list DMZ extended permit tcp any any
+access-list DMZ extended permit udp any any
+access-list DMZ extended permit ip any any
+access-group DMZ in interface dmz
+
+!
+
+--permit Camera access Server IOT
+access-list INSIDE extended permit ip 168.72.50.0 255.255.255.0 host 168.72.100.101  
+--deny Others to Server IOT 
+access-list INSIDE extended deny ip any host 168.72.100.101   
+access-list INSIDE extended deny ip any host 168.72.100.4   
+
+--deny Others access IOT web
+access-list INSIDE extended deny tcp 168.72.11.0 255.255.255.0 host 168.72.100.101   
+access-list INSIDE extended deny tcp 168.72.12.0 255.255.255.0 host 168.72.100.101
+access-list INSIDE extended deny tcp 168.72.150.0 255.255.255.0 host 168.72.100.101
+access-list INSIDE extended permit ip any any
+access-list INSIDE extended permit tcp any any
+access-list INSIDE extended permit udp any any
+access-group INSIDE in interface inside
+

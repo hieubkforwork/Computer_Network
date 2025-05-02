@@ -1,0 +1,85 @@
+Cấu hình VPN Site-Site:
+
+2. Make sure routers have the security license enabled:
+license boot module c2900 technology-package securityk9
+
+3. Configure IPsec on the routers at each end of the tunnel (R1 and R3)
+!R1
+access-list 100 permit 172.16.0.0 
+crypto isakmp policy 10
+ encryption aes 256
+ authentication pre-share
+ group 5
+crypto isakmp key secretkey address 172.16.2.2
+crypto ipsec transform-set R1-R2 esp-aes 256 esp-sha-hmac
+crypto map IPSEC-MAP 10 ipsec-isakmp 
+ set peer 172.16.2.2
+ set pfs group5
+ set security-association lifetime seconds 86400
+ set transform-set R1-R2
+ match address 100
+ interface se0/0/0
+ crypto map IPSEC-MAP
+!R2
+access-list 100 permit ip any any
+crypto isakmp policy 10
+ encryption aes 256
+ authentication pre-share
+ group 5
+crypto isakmp key secretkey address 172.16.1.2
+crypto ipsec transform-set R2-R1 esp-aes 256 esp-sha-hmac
+crypto map IPSEC-MAP 10 ipsec-isakmp 
+ set peer 172.16.1.2
+ set pfs group5
+ set security-association lifetime seconds 86400
+ set transform-set R2-R1 
+ match address 100
+interface se0/0/0
+ crypto map IPSEC-MAP
+!
+
+
+!CHUNG
+interface se0/0/0
+ crypto map IPSEC-MAP
+
+
+
+
+
+HUỶ:
+!
+interface se0/0/0
+no crypto map IPSEC-MAP
+exit
+no crypto map IPSEC-MAP
+no crypto ipsec transform-set R1-R2
+no crypto isakmp policy 10
+no crypto isakmp key secretkey address 172.16.2.2
+no access-list 100
+!
+interface se0/0/0
+no crypto map IPSEC-MAP
+exit
+no crypto map IPSEC-MAP
+no crypto ipsec transform-set R2-R1
+no crypto isakmp policy 10
+no crypto isakmp key secretkey address 172.16.1.2
+no access-list 100
+
+interface se0/0/0
+no crypto map IPSEC-MAP
+exit
+no crypto map IPSEC-MAP
+no crypto ipsec transform-set R3-R1
+no crypto isakmp policy 10
+no crypto isakmp key secretkey address 172.16.1.2
+no access-list 100
+
+Kiểm tra:
+show crypto isakmp sa
+show crypto ipsec sa
+show run | include crypto map
+	
+
+
